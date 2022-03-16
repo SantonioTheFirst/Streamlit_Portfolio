@@ -21,21 +21,20 @@ This toy website allows you to **interact** with ML models.
 Deep Convolutional Generative Adversarial Net trained on anime faces dataset to generate not existing animes.
 '''
 
-model_path = 'model/generator.h5'
-generator = load_model(model_path)
+model_dcganime_path = 'model/generator.h5'
+generator = load_model(model_dcganime_path)
 latent_dims = 100
 
 
+model_cats_path = 'model/cats_vs_dogs.h5'
+model = load_model(model_cats_path)
+
+
 grid_size = st.slider('Select grid size: ', 2, 6)
-# ganime_URL = 'http://127.0.0.1:8000'
 
-# image = (np.array(requests.get(ganime_URL).json()['Image'][0]) + 1) / 2
-# print(image.shape, type(image))
-# print(image)
 
-def test(grid_size):
+def plot_images(grid_size):
     with st.container():
-        ind = 0
         for row in range(grid_size):
             for col in st.columns(grid_size):
                 with col:
@@ -45,10 +44,9 @@ def test(grid_size):
                         image,
                         use_column_width="always",
                     )
-                    ind += 1
 
 if st.button('Generate') or grid_size:
-    test(grid_size)
+    plot_images(grid_size)
 
 
 '''
@@ -64,9 +62,13 @@ file = st.file_uploader('Upload your cat or dog image file', accept_multiple_fil
 if file:
     st.image(file)
     with Image.open(file) as im:
-        image_array = np.asarray(im)
-    # print(image_array.shape)
-    # response = 
+        image_array = np.asarray(im, dtype=np.uint8)
+        prediction = model.predict(np.expand_dims(image_array, axis=0))[0]
+        f'''
+        ##### Result
+        Cat: {np.round(prediction[0] * 100, 4)}%
+        Dog: {np.round(prediction[1] * 100, 4)}%
+        '''
 
 '''
 ---
